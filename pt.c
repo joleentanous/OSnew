@@ -4,6 +4,7 @@
 
 
 void page_table_update(uint64_t pt, uint64_t vpn, uint64_t ppn){
+    //an array to split the vpn into symbols
     int indx[5];
     for (int i=0; i<=4; i++){
         indx[4-i] = (vpn >> (9*i)) & 0x1FF;
@@ -14,8 +15,10 @@ void page_table_update(uint64_t pt, uint64_t vpn, uint64_t ppn){
     for (int i=0; i<4; i++){
         cur_pt = (uint64_t*)phys_to_virt(shifted);
         uint64_t prefix = cur_pt[indx[i]];
+        //checking validity of each entry
         if ((prefix & 1) == 0) {
             if (ppn == NO_MAPPING){
+                //no need to change anything
                 return ;
             }
             uint64_t new_page = (alloc_page_frame() << OFFSET) | 1;
